@@ -175,8 +175,7 @@ const TransactionList = ({
                             isIncome ? "text-emerald-400" : "text-rose-400"
                           }`}
                         >
-                          {isIncome ? "+" : "-"}₹
-                          {Number(item.amount).toLocaleString()}
+                          ₹{Number(item.amount).toLocaleString()}
                         </td>
                         <td className="py-3.5 px-4">
                           <div className="flex items-center justify-center gap-1">
