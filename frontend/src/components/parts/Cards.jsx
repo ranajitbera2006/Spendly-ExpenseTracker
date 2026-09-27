@@ -37,14 +37,14 @@ const Cards = ({ transactions = [] }) => {
       name: "Total Income",
       value: `₹${totalIncome.toLocaleString()}`,
       icon: <FaArrowUp size={20} />,
-      des: "Earnings this month",
+      des: "All-time earnings",
       color: "bg-emerald-600",
     },
     {
       name: "Total Spent",
       value: `₹${totalSpent.toLocaleString()}`,
       icon: <FaArrowDown size={20} />,
-      des: "Transactions this month",
+      des: "All-time spending",
       color: "bg-rose-600",
     },
     {
