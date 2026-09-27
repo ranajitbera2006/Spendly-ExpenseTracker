@@ -2,24 +2,24 @@ import React, { useState, useEffect } from "react";
 import { FiX, FiCalendar, FiTag, FiFileText, FiCheck } from "react-icons/fi";
 import { MdCurrencyRupee } from "react-icons/md";
 
-const transactionCategories = [
-  "Food",
-  "Transportation",
-  "Entertainment",
-  "Shopping",
-  "Bills",
-  "Healthcare",
-  "Other",
+const expenseCategories = [
+  "food",
+  "transportation",
+  "entertainment",
+  "shopping",
+  "bills",
+  "healthcare",
+  "other",
 ];
 
 const incomeCategories = [
-  "Salary",
-  "Freelance",
-  "Investments",
-  "Dividends",
-  "Rental",
-  "Gifts",
-  "Other",
+  "salary",
+  "freelance",
+  "investments",
+  "dividends",
+  "rental",
+  "gifts",
+  "other",
 ];
 
 const EditTransaction = ({
@@ -31,52 +31,67 @@ const EditTransaction = ({
 }) => {
   const handleClose = onClose || onCloseEditTransaction;
 
-  const [type, setType] = useState(transaction?.amountType || "expense");
+  const [type, setType] = useState(
+    transaction?.amountType || transaction?.type || "expense",
+  );
   const [description, setDescription] = useState(
     transaction?.description || "",
   );
-  const [category, setCategory] = useState(
-    transaction?.category ||
-      (transaction?.amountType === "income"
-        ? incomeCategories[0]
-        : transactionCategories[0]),
+
+  // Helper to ensure the category starts with a valid lowercase value
+  const getInitialCategory = (rawCategory, currentType) => {
+    const list =
+      currentType === "income" ? incomeCategories : expenseCategories;
+    const normalized = rawCategory?.toLowerCase();
+    return list.includes(normalized) ? normalized : list[0];
+  };
+
+  const [category, setCategory] = useState(() =>
+    getInitialCategory(
+      transaction?.category,
+      transaction?.amountType || transaction?.type || "expense",
+    ),
   );
+
   const [amount, setAmount] = useState(transaction?.amount ?? "");
-  const [date, setDate] = useState(
-    transaction?.date
-      ? new Date(transaction.date).toISOString().split("T")[0]
-      : new Date().toISOString().split("T")[0],
-  );
+  const [date, setDate] = useState(() => {
+    if (!transaction?.date) return new Date().toLocaleDateString("en-CA");
+    const d = new Date(transaction.date);
+    return !isNaN(d.getTime())
+      ? d.toLocaleDateString("en-CA")
+      : new Date().toLocaleDateString("en-CA");
+  });
 
   const activeCategories =
-    type === "expense" ? transactionCategories : incomeCategories;
+    type === "income" ? incomeCategories : expenseCategories;
 
-  // Sync inputs if the transaction prop changes externally
+  // Sync inputs if transaction prop changes
   useEffect(() => {
     if (transaction) {
-      const currentType = transaction.amountType || "expense";
+      const currentType =
+        transaction.amountType || transaction.type || "expense";
       setType(currentType);
       setDescription(transaction.description || "");
       setAmount(transaction.amount ?? "");
+
+      const d = transaction.date ? new Date(transaction.date) : new Date();
       setDate(
-        transaction.date
-          ? new Date(transaction.date).toISOString().split("T")[0]
-          : new Date().toISOString().split("T")[0],
+        !isNaN(d.getTime())
+          ? d.toLocaleDateString("en-CA")
+          : new Date().toLocaleDateString("en-CA"),
       );
-      setCategory(
-        transaction.category ||
-          (currentType === "income"
-            ? incomeCategories[0]
-            : transactionCategories[0]),
-      );
+
+      setCategory(getInitialCategory(transaction.category, currentType));
     }
   }, [transaction]);
 
-  // Adjust category when user toggles type manually
+  // Adjust category when user toggles type (Expense <-> Income)
   const handleTypeChange = (newType) => {
     setType(newType);
     const targetCategories =
-      newType === "expense" ? transactionCategories : incomeCategories;
+      newType === "income" ? incomeCategories : expenseCategories;
+
+    // If current category does not belong to new type, switch to default
     if (!targetCategories.includes(category)) {
       setCategory(targetCategories[0]);
     }
@@ -89,8 +104,9 @@ const EditTransaction = ({
       ...(transaction?._id && { _id: transaction._id }),
       ...(transaction?.id && { id: transaction.id }),
       amountType: type,
+      type,
       description,
-      category,
+      category, // Already lowercase (e.g. "food"), matches DB enum
       amount: Number(amount),
       date,
     };
@@ -170,7 +186,7 @@ const EditTransaction = ({
             </div>
           </div>
 
-          {/* Category */}
+          {/* Category Dropdown */}
           <div>
             <label className="block text-xs font-semibold uppercase text-slate-400 mb-1">
               Category
@@ -180,18 +196,19 @@ const EditTransaction = ({
                 <FiTag />
               </span>
               <select
-                value={category.toLowerCase()}
-                onChange={(e) => setCategory(e.target.value.toLowerCase())}
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 required
-                className="w-full pl-10 pr-8 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-slate-200 text-sm focus:outline-none focus:border-sky-500 cursor-pointer appearance-none"
+                className="w-full pl-10 pr-8 py-2.5 bg-slate-950/60 border border-slate-800 rounded-xl text-slate-200 text-sm capitalize focus:outline-none focus:border-sky-500 cursor-pointer appearance-none"
               >
                 {activeCategories.map((cat) => (
                   <option
                     key={cat}
                     value={cat}
-                    className="bg-slate-900 text-slate-200"
+                    className="bg-slate-900 text-slate-200 capitalize"
                   >
-                    {cat}
+                    {/* Capitalize text visually while keeping value lowercase */}
+                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
                   </option>
                 ))}
               </select>
