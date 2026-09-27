@@ -144,7 +144,7 @@ const TransactionList = ({
                     const isIncome =
                       item.type === "income" || item.amountType === "income";
                     const cat =
-                      categoryConfig[item.category] || categoryConfig.Other;
+                      categoryConfig[item.category] || categoryConfig.other;
                     const dateFormatted = item.date
                       ? new Date(item.date)
                           .toLocaleDateString("en-GB")
@@ -175,7 +175,8 @@ const TransactionList = ({
                             isIncome ? "text-emerald-400" : "text-rose-400"
                           }`}
                         >
-                          ₹{Number(item.amount).toLocaleString()}
+                          {isIncome ? "+" : "-"}₹
+                          {Number(item.amount).toLocaleString()}
                         </td>
                         <td className="py-3.5 px-4">
                           <div className="flex items-center justify-center gap-1">
@@ -218,9 +219,11 @@ const TransactionList = ({
                 const isIncome =
                   item.type === "income" || item.amountType === "income";
                 const cat =
-                  categoryConfig[item.category] || categoryConfig.Other;
+                  categoryConfig[item.category] || categoryConfig.other;
                 const dateFormatted = item.date
-                  ? new Date(item.date).toISOString().split("T")[0]
+                  ? new Date(item.date)
+                      .toLocaleDateString("en-GB")
+                      .replace(/\//g, "-")
                   : "—";
 
                 return (
@@ -248,8 +251,7 @@ const TransactionList = ({
                           isIncome ? "text-emerald-400" : "text-rose-400"
                         }`}
                       >
-                        {isIncome ? "+" : "-"}₹
-                        {Number(item.amount).toLocaleString()}
+                        ₹{Number(item.amount).toLocaleString()}
                       </span>
                       <div className="flex items-center">
                         <button
