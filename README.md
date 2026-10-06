@@ -38,8 +38,8 @@ A production-ready full-stack personal finance platform engineered to track cash
     <td width="50%" align="center"><b>Transaction Ledger View</b></td>
   </tr>
   <tr>
-    <td><img src="public/dashboardImg.png" alt="Spendly Analytics Dashboard" width="100%"/></td>
-    <td><img src="public/transactionImg.png" alt="Spendly Transaction Ledger" width="100%"/></td>
+    <td><img src="frontend/public/dashboardImg.png" alt="Spendly Analytics Dashboard" width="100%"/></td>
+    <td><img src="frontend/public/transactionImg.png" alt="Spendly Transaction Ledger" width="100%"/></td>
   </tr>
 </table>
 
